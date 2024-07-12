@@ -182,12 +182,18 @@ def list_noncompliant_files(args: argparse.Namespace, proj: project.Project) -> 
     list
         List of the files that are missing license headers.
     """
+    import time
+
+    s = time.time()
+
     # Create a temporary file containing lint.run json output
     filename = None
     with NamedTemporaryFile(mode="w", delete=False) as tmp:
         args.json = True
         lint.run(args, proj, tmp)
         filename = tmp.name
+    print("***", time.time() - s)
+    s = time.time()
 
     # Open the temporary file, load the JSON file, and find files that
     # are missing license headers.
@@ -197,6 +203,8 @@ def list_noncompliant_files(args: argparse.Namespace, proj: project.Project) -> 
 
     # Get files missing copyright information
     missing_headers = set(lint_json["non_compliant"]["missing_copyright_info"])
+    print("***", time.time() - s)
+    s = time.time()
 
     # If ignore_license_check is False, check files for missing licensing information
     if not args.ignore_license_check:
@@ -205,6 +213,8 @@ def list_noncompliant_files(args: argparse.Namespace, proj: project.Project) -> 
 
     # Remove temporary file
     os.remove(filename)
+    print("***", time.time() - s)
+    s = time.time()
 
     return missing_headers
 
