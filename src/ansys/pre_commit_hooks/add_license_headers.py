@@ -15,7 +15,7 @@
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHERa
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
@@ -644,6 +644,9 @@ def find_files_missing_header() -> int:
         ``2`` if the ``.reuse`` or location directory does not exist in the root path
         of the GitHub repository.
     """
+    import time
+
+    s = time.time()
     # Set up argparse for location, parser, and lint
     # Lint contains four arguments: quiet, json, plain, and no_multiprocessing
     parser = argparse.ArgumentParser()
@@ -651,6 +654,8 @@ def find_files_missing_header() -> int:
 
     # Get root directory of the git repository.
     git_repo = git.Repo(os.getcwd(), search_parent_directories=True)
+    print(time.time() - s)
+    s = time.time()
 
     # Set changed_headers to zero by default
     changed_headers = 0
@@ -667,6 +672,8 @@ def find_files_missing_header() -> int:
             exit(1)
     except ValueError:
         print("Please ensure the start year is a number.")
+    print(time.time() - s)
+    s = time.time()
 
     # Create dictionary containing the committed files, custom copyright,
     # template, license, changed_headers, year, and git_repo
@@ -679,10 +686,13 @@ def find_files_missing_header() -> int:
         "current_year": dt.today().year,
         "git_repo": git_repo,
     }
-    print("values", values)
+    print(time.time() - s)
+    s = time.time()
 
     # Update the year in the copyright line of the LICENSE file
     license_return_code = update_license_file(values)
+    print(time.time() - s)
+    s = time.time()
 
     # Run REUSE on root of the repository
     git_root = values["git_repo"].git.rev_parse("--show-toplevel")
@@ -711,12 +721,16 @@ def find_files_missing_header() -> int:
 
     # Link the default template and/or license from the assets folder to your git repo.
     link_assets(assets, os_git_root, args)
+    print(time.time() - s)
+    s = time.time()
 
     # Project to run `REUSE <https://reuse.software/>`_ on
     proj = project.Project(git_root)
 
     # Get files missing headers (copyright and/or license information)
     missing_headers = list(list_noncompliant_files(args, proj))
+    print(time.time() - s)
+    s = time.time()
 
     # Add or update headers of required files.
     # Return 1 if files were added or updated, and return 0 if no files were altered.
@@ -728,9 +742,13 @@ def find_files_missing_header() -> int:
         file_return_code = non_recursive_file_check(
             changed_headers, parser, values, proj, missing_headers
         )
+    print(time.time() - s)
+    s = time.time()
 
     # Unlink default files & remove .reuse and LICENSES folders if empty
     cleanup(assets, os_git_root)
+    print(time.time() - s)
+    s = time.time()
 
     # Returns 1 if REUSE changes noncompliant files or the year was updated in LICENSE
     # Returns 0 if all files are compliant
