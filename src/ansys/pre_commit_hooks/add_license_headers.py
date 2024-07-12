@@ -674,6 +674,7 @@ def find_files_missing_header() -> int:
         "git_repo": git_repo,
     }
     print("values", values)
+    pass
 
     # Update the year in the copyright line of the LICENSE file
     license_return_code = update_license_file(values)
