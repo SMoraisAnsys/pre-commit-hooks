@@ -278,6 +278,7 @@ def non_recursive_file_check(changed_headers, parser, values, proj, missing_head
         ``1`` if ``REUSE`` changed all noncompliant files.
     """
     files = values["files"]
+    print("non_recursive_file_check", files)
     start_year = values["start_year"]
     current_year = values["current_year"]
     copyright = values["copyright"]
@@ -350,6 +351,7 @@ def recursive_file_check(changed_headers, parser, values, proj, missing_headers,
         ``1`` if ``REUSE`` changed all noncompliant files.
     """
     files = values["files"]
+    print("recursive_file_check", files)
     start_year = values["start_year"]
     current_year = values["current_year"]
     copyright = values["copyright"]
@@ -671,6 +673,7 @@ def find_files_missing_header() -> int:
         "current_year": dt.today().year,
         "git_repo": git_repo,
     }
+    print("values", values)
 
     # Update the year in the copyright line of the LICENSE file
     license_return_code = update_license_file(values)
